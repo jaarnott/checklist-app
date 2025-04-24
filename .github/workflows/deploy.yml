@@ -1,0 +1,33 @@
+name: Azure Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore
+      run: dotnet restore ./LoadedChecklist/backend
+
+    - name: Build
+      run: dotnet build ./LoadedChecklist/backend --configuration Release
+
+    - name: Publish
+      run: dotnet publish ./LoadedChecklist/backend -c Release -o release
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: YOUR_AZURE_APP_NAME
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+        package: release
