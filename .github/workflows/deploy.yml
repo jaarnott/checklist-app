@@ -1,4 +1,4 @@
-name: Azure Deployment
+name: Deploy Loaded Checklist to Azure
 
 on:
   push:
@@ -19,9 +19,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
 
-     - name: Restore dependencies
+      - name: Restore dependencies
         run: dotnet restore ./LoadedChecklist/backend/LoadedChecklist.csproj
 
       - name: Build
@@ -30,7 +30,7 @@ jobs:
       - name: Publish
         run: dotnet publish ./LoadedChecklist/backend/LoadedChecklist.csproj -c Release -o release
 
-      - name: Azure Login
+      - name: Azure Login (OIDC)
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -40,7 +40,5 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: loadedhub-checklist   # 👈 Replace with your actual Azure Web App name
+          app-name: loaded-checklist
           package: release
-
-
