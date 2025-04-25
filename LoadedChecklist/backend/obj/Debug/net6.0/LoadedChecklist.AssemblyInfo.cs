@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LoadedChecklist")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae238de7e332dd7b8403decf0b5379a51dfdb45d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+929706a7dd31c77bab7f7878d8156a1cdf728054")]
 [assembly: System.Reflection.AssemblyProductAttribute("LoadedChecklist")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LoadedChecklist")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
