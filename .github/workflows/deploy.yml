@@ -21,17 +21,32 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install frontend dependencies
+        run: |
+          cd LoadedChecklist/frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd LoadedChecklist/frontend
+          npm run build
+
+      - name: Restore backend dependencies
         run: |
           cd LoadedChecklist/backend
           dotnet restore LoadedChecklist.csproj
 
-      - name: Build the app
+      - name: Build the backend
         run: |
           cd LoadedChecklist/backend
           dotnet build LoadedChecklist.csproj --configuration Release
 
-      - name: Publish the app
+      - name: Publish the backend
         run: |
           cd LoadedChecklist/backend
           dotnet publish LoadedChecklist.csproj -c Release -o ../../release
@@ -48,4 +63,3 @@ jobs:
         with:
           app-name: loaded-checklist
           package: release
-
