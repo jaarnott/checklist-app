@@ -42,3 +42,5 @@ jobs:
         with:
           app-name: loadedhub-checklist   # 👈 Replace with your actual Azure Web App name
           package: release
+
+
