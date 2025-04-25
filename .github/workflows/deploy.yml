@@ -21,35 +21,39 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Setup Node.js
+      - name: Setup Node.js for Vite
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
       - name: Install frontend dependencies
-        run: |
-          cd LoadedChecklist/frontend
-          npm install
+        working-directory: LoadedChecklist/frontend
+        run: npm ci
 
       - name: Build frontend
+        working-directory: LoadedChecklist/frontend
+        run: npm run build
+
+      - name: List frontend build output
+        run: ls -la LoadedChecklist/frontend/dist || echo "dist folder missing"
+
+      - name: Copy frontend to backend wwwroot
         run: |
-          cd LoadedChecklist/frontend
-          npm run build
+          rm -rf LoadedChecklist/backend/wwwroot
+          mkdir -p LoadedChecklist/backend/wwwroot
+          cp -r LoadedChecklist/frontend/dist/* LoadedChecklist/backend/wwwroot/
 
       - name: Restore backend dependencies
-        run: |
-          cd LoadedChecklist/backend
-          dotnet restore LoadedChecklist.csproj
+        working-directory: LoadedChecklist/backend
+        run: dotnet restore LoadedChecklist.csproj
 
-      - name: Build the backend
-        run: |
-          cd LoadedChecklist/backend
-          dotnet build LoadedChecklist.csproj --configuration Release
+      - name: Build backend
+        working-directory: LoadedChecklist/backend
+        run: dotnet build LoadedChecklist.csproj --configuration Release
 
-      - name: Publish the backend
-        run: |
-          cd LoadedChecklist/backend
-          dotnet publish LoadedChecklist.csproj -c Release -o ../../release
+      - name: Publish backend
+        working-directory: LoadedChecklist/backend
+        run: dotnet publish LoadedChecklist.csproj -c Release -o ../../release
 
       - name: Azure Login via OIDC
         uses: azure/login@v1
