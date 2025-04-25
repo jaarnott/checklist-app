@@ -3,6 +3,7 @@ using LoadedChecklist.Data;
 using LoadedChecklist.Models;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace LoadedChecklist.Controllers
 {
@@ -17,6 +18,7 @@ namespace LoadedChecklist.Controllers
             _context = context;
         }
 
+        // GET: api/checklist
         [HttpGet]
         public async Task<IActionResult> GetItems()
         {
@@ -24,11 +26,18 @@ namespace LoadedChecklist.Controllers
             return Ok(items);
         }
 
+        // POST: api/checklist
         [HttpPost]
-        public async Task<IActionResult> AddItem(ChecklistItem item)
+        public async Task<IActionResult> AddItem([FromBody] ChecklistItem item)
         {
+            if (string.IsNullOrWhiteSpace(item.Title))
+            {
+                return BadRequest("Title is required.");
+            }
+
             _context.ChecklistItems.Add(item);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetItems), new { id = item.Id }, item);
         }
     }
