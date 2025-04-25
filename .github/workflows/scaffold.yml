@@ -1,16 +1,19 @@
 name: Scaffold Checklist App
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   scaffold:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js for Frontend
+      # Step 2: Set up Node.js for the React frontend
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -19,63 +22,67 @@ jobs:
         run: |
           mkdir -p frontend/src/pages frontend/src/components
           cd frontend
+
+          # Initialize package.json and install dependencies
           npm init -y
           npm install react react-dom react-router-dom axios
-          echo '{
-  "name": "checklist-app",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.14.1",
-    "axios": "^1.4.0"
-  }
-}' > package.json
+
+          # Create the basic App.tsx file
           mkdir -p src
-          echo 'import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import ChecklistDetails from "./pages/ChecklistDetails";
+          cat <<EOL > src/App.tsx
+          import React from "react";
+          import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+          import Dashboard from "./pages/Dashboard";
+          import ChecklistDetails from "./pages/ChecklistDetails";
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/checklist/:id" element={<ChecklistDetails />} />
-      </Routes>
-    </Router>
-  );
-}
+          function App() {
+            return (
+              <Router>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/checklist/:id" element={<ChecklistDetails />} />
+                </Routes>
+              </Router>
+            );
+          }
 
-export default App;' > src/App.tsx
-          echo 'import React from "react";
+          export default App;
+          EOL
 
-function Dashboard() {
-  return (
-    <div>
-      <h1>Checklist Dashboard</h1>
-      <p>This is the starting point for displaying all checklists.</p>
-    </div>
-  );
-}
+          # Create the Dashboard.tsx file
+          cat <<EOL > src/pages/Dashboard.tsx
+          import React from "react";
 
-export default Dashboard;' > src/pages/Dashboard.tsx
-          echo 'import React from "react";
+          function Dashboard() {
+            return (
+              <div>
+                <h1>Checklist Dashboard</h1>
+                <p>This is the starting point for displaying all checklists.</p>
+              </div>
+            );
+          }
 
-function ChecklistDetails() {
-  return (
-    <div>
-      <h1>Checklist Details</h1>
-      <p>Details for a specific checklist will be displayed here.</p>
-    </div>
-  );
-}
+          export default Dashboard;
+          EOL
 
-export default ChecklistDetails;' > src/pages/ChecklistDetails.tsx
+          # Create the ChecklistDetails.tsx file
+          cat <<EOL > src/pages/ChecklistDetails.tsx
+          import React from "react";
 
-      - name: Set up .NET Core for Backend
+          function ChecklistDetails() {
+            return (
+              <div>
+                <h1>Checklist Details</h1>
+                <p>Details for a specific checklist will be displayed here.</p>
+              </div>
+            );
+          }
+
+          export default ChecklistDetails;
+          EOL
+
+      # Step 3: Set up .NET Core for the backend
+      - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0
@@ -85,70 +92,83 @@ export default ChecklistDetails;' > src/pages/ChecklistDetails.tsx
           mkdir backend
           cd backend
           dotnet new webapi -o .
-          echo 'using Microsoft.AspNetCore.Mvc;
 
-namespace ChecklistApp.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ChecklistsController : ControllerBase
-    {
-        [HttpGet]
-        public IActionResult GetChecklists()
-        {
-            return Ok(new { message = "List of checklists" });
-        }
+          # Create the ChecklistsController.cs file
+          cat <<EOL > Controllers/ChecklistsController.cs
+          using Microsoft.AspNetCore.Mvc;
 
-        [HttpPost]
-        public IActionResult CreateChecklist()
-        {
-            return Ok(new { message = "Checklist created" });
-        }
-    }
-}' > Controllers/ChecklistsController.cs
-          echo 'using Microsoft.AspNetCore.Mvc;
+          namespace ChecklistApp.Controllers
+          {
+              [ApiController]
+              [Route("api/[controller]")]
+              public class ChecklistsController : ControllerBase
+              {
+                  [HttpGet]
+                  public IActionResult GetChecklists()
+                  {
+                      return Ok(new { message = "List of checklists" });
+                  }
 
-namespace ChecklistApp.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TasksController : ControllerBase
-    {
-        [HttpGet]
-        public IActionResult GetTasks()
-        {
-            return Ok(new { message = "List of tasks" });
-        }
+                  [HttpPost]
+                  public IActionResult CreateChecklist()
+                  {
+                      return Ok(new { message = "Checklist created" });
+                  }
+              }
+          }
+          EOL
 
-        [HttpPost]
-        public IActionResult CreateTask()
-        {
-            return Ok(new { message = "Task created" });
-        }
-    }
-}' > Controllers/TasksController.cs
-          echo 'using Microsoft.AspNetCore.Mvc;
+          # Create the TasksController.cs file
+          cat <<EOL > Controllers/TasksController.cs
+          using Microsoft.AspNetCore.Mvc;
 
-namespace ChecklistApp.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
-    {
-        [HttpGet]
-        public IActionResult GetUsers()
-        {
-            return Ok(new { message = "List of users" });
-        }
+          namespace ChecklistApp.Controllers
+          {
+              [ApiController]
+              [Route("api/[controller]")]
+              public class TasksController : ControllerBase
+              {
+                  [HttpGet]
+                  public IActionResult GetTasks()
+                  {
+                      return Ok(new { message = "List of tasks" });
+                  }
 
-        [HttpPost]
-        public IActionResult CreateUser()
-        {
-            return Ok(new { message = "User created" });
-        }
-    }
-}' > Controllers/UsersController.cs
+                  [HttpPost]
+                  public IActionResult CreateTask()
+                  {
+                      return Ok(new { message = "Task created" });
+                  }
+              }
+          }
+          EOL
 
+          # Create the UsersController.cs file
+          cat <<EOL > Controllers/UsersController.cs
+          using Microsoft.AspNetCore.Mvc;
+
+          namespace ChecklistApp.Controllers
+          {
+              [ApiController]
+              [Route("api/[controller]")]
+              public class UsersController : ControllerBase
+              {
+                  [HttpGet]
+                  public IActionResult GetUsers()
+                  {
+                      return Ok(new { message = "List of users" });
+                  }
+
+                  [HttpPost]
+                  public IActionResult CreateUser()
+                  {
+                      return Ok(new { message = "User created" });
+                  }
+              }
+          }
+          EOL
+
+      # Step 4: Commit and push changes to a new branch
       - name: Commit and Push Changes
         run: |
           git config --local user.name "GitHub Actions"
