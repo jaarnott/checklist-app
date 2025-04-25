@@ -29,12 +29,6 @@ jobs:
         working-directory: LoadedChecklist/frontend
         run: npm run build
 
-      - name: Copy frontend build into backend wwwroot
-        run: |
-          rm -rf LoadedChecklist/backend/wwwroot
-          mkdir -p LoadedChecklist/backend/wwwroot
-          cp -r LoadedChecklist/frontend/dist/* LoadedChecklist/backend/wwwroot/
-
       - name: Setup .NET 8 SDK
         uses: actions/setup-dotnet@v3
         with:
@@ -43,10 +37,6 @@ jobs:
       - name: Restore dependencies
         working-directory: LoadedChecklist/backend
         run: dotnet restore LoadedChecklist.csproj
-
-      - name: Build the app
-        working-directory: LoadedChecklist/backend
-        run: dotnet build LoadedChecklist.csproj --configuration Release
 
       - name: Publish the app
         working-directory: LoadedChecklist/backend
