@@ -23,6 +23,8 @@ var app = builder.Build();
 app.UseRouting();
 
 // ✅ Map controller endpoints
+app.UseDefaultFiles();  // looks for index.html
+app.UseStaticFiles();   // serves from wwwroot/
 app.MapControllers();
 
 app.UseRouting();
