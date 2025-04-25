@@ -16,42 +16,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET 8 SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Setup Node.js for Vite
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
       - name: Install frontend dependencies
         working-directory: LoadedChecklist/frontend
-        run: npm ci
+        run: npm install
 
       - name: Build frontend
         working-directory: LoadedChecklist/frontend
         run: npm run build
 
-      - name: List frontend build output
-        run: ls -la LoadedChecklist/frontend/dist || echo "dist folder missing"
-
-      - name: Copy frontend to backend wwwroot
+      - name: Copy frontend build into backend wwwroot
         run: |
           rm -rf LoadedChecklist/backend/wwwroot
           mkdir -p LoadedChecklist/backend/wwwroot
           cp -r LoadedChecklist/frontend/dist/* LoadedChecklist/backend/wwwroot/
 
-      - name: Restore backend dependencies
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
         working-directory: LoadedChecklist/backend
         run: dotnet restore LoadedChecklist.csproj
 
-      - name: Build backend
+      - name: Build the app
         working-directory: LoadedChecklist/backend
         run: dotnet build LoadedChecklist.csproj --configuration Release
 
-      - name: Publish backend
+      - name: Publish the app
         working-directory: LoadedChecklist/backend
         run: dotnet publish LoadedChecklist.csproj -c Release -o ../../release
 
