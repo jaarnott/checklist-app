@@ -21,14 +21,14 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore ./LoadedChecklist/backend
+     - name: Restore dependencies
+        run: dotnet restore ./LoadedChecklist/backend/LoadedChecklist.csproj
 
       - name: Build
-        run: dotnet build ./LoadedChecklist/backend --configuration Release
+        run: dotnet build ./LoadedChecklist/backend/LoadedChecklist.csproj --configuration Release
 
       - name: Publish
-        run: dotnet publish ./LoadedChecklist/backend -c Release -o release
+        run: dotnet publish ./LoadedChecklist/backend/LoadedChecklist.csproj -c Release -o release
 
       - name: Azure Login
         uses: azure/login@v1
