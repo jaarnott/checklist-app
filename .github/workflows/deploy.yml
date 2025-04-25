@@ -22,16 +22,19 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        working-directory: LoadedChecklist/backend
-        run: dotnet restore LoadedChecklist.csproj
+        run: |
+          cd LoadedChecklist/backend
+          dotnet restore LoadedChecklist.csproj
 
       - name: Build the app
-        working-directory: LoadedChecklist/backend
-        run: dotnet build LoadedChecklist.csproj --configuration Release
+        run: |
+          cd LoadedChecklist/backend
+          dotnet build LoadedChecklist.csproj --configuration Release
 
       - name: Publish the app
-        working-directory: LoadedChecklist/backend
-        run: dotnet publish LoadedChecklist.csproj -c Release -o ../../release
+        run: |
+          cd LoadedChecklist/backend
+          dotnet publish LoadedChecklist.csproj -c Release -o ../../release
 
       - name: Azure Login via OIDC
         uses: azure/login@v1
