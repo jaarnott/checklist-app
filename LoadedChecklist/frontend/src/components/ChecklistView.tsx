@@ -1,46 +1,83 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect, FormEvent } from 'react';
 
-type ChecklistItem = {
+interface ChecklistItem {
   id: number;
   title: string;
   isCompleted: boolean;
-};
+}
 
-export default function ChecklistView() {
+function Checklist() {
   const [items, setItems] = useState<ChecklistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [newTitle, setNewTitle] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/checklist")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
-      .then(setItems)
-      .catch(() => setError("Unable to load checklist 😢"))
-      .finally(() => setLoading(false));
+    fetchItems();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  const fetchItems = () => {
+    fetch('/api/checklist')
+      .then((response) => response.json())
+      .then((data: ChecklistItem[]) => setItems(data))
+      .catch((error) => setError('Error fetching checklist: ' + error.message));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/checklist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle, isCompleted: false }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add item');
+      }
+
+      setNewTitle('');
+      fetchItems();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Loaded Checklist ✅</h1>
-      <ul className="space-y-2">
-        {items.map(item => (
-          <li key={item.id} className="border p-2 rounded shadow-sm flex items-center">
-            <input
-              type="checkbox"
-              checked={item.isCompleted}
-              readOnly
-              className="mr-2"
-            />
-            <span>{item.title}</span>
+    <div>
+      <h2>Checklist Items</h2>
+
+      <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+        <input
+          type="text"
+          placeholder="New item title"
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          disabled={isSubmitting}
+        />
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Adding...' : 'Add Item'}
+        </button>
+      </form>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>
+            {item.title} {item.isCompleted ? '✅' : ''}
           </li>
         ))}
       </ul>
     </div>
   );
 }
+
+export default Checklist;
