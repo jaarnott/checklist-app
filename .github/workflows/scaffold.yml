@@ -1,0 +1,159 @@
+name: Scaffold Checklist App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js for Frontend
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Scaffold React Frontend
+        run: |
+          mkdir -p frontend/src/pages frontend/src/components
+          cd frontend
+          npm init -y
+          npm install react react-dom react-router-dom axios
+          echo '{
+  "name": "checklist-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.1",
+    "axios": "^1.4.0"
+  }
+}' > package.json
+          mkdir -p src
+          echo 'import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import ChecklistDetails from "./pages/ChecklistDetails";
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/checklist/:id" element={<ChecklistDetails />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;' > src/App.tsx
+          echo 'import React from "react";
+
+function Dashboard() {
+  return (
+    <div>
+      <h1>Checklist Dashboard</h1>
+      <p>This is the starting point for displaying all checklists.</p>
+    </div>
+  );
+}
+
+export default Dashboard;' > src/pages/Dashboard.tsx
+          echo 'import React from "react";
+
+function ChecklistDetails() {
+  return (
+    <div>
+      <h1>Checklist Details</h1>
+      <p>Details for a specific checklist will be displayed here.</p>
+    </div>
+  );
+}
+
+export default ChecklistDetails;' > src/pages/ChecklistDetails.tsx
+
+      - name: Set up .NET Core for Backend
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0
+
+      - name: Scaffold ASP.NET Core Backend
+        run: |
+          mkdir backend
+          cd backend
+          dotnet new webapi -o .
+          echo 'using Microsoft.AspNetCore.Mvc;
+
+namespace ChecklistApp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ChecklistsController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult GetChecklists()
+        {
+            return Ok(new { message = "List of checklists" });
+        }
+
+        [HttpPost]
+        public IActionResult CreateChecklist()
+        {
+            return Ok(new { message = "Checklist created" });
+        }
+    }
+}' > Controllers/ChecklistsController.cs
+          echo 'using Microsoft.AspNetCore.Mvc;
+
+namespace ChecklistApp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TasksController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult GetTasks()
+        {
+            return Ok(new { message = "List of tasks" });
+        }
+
+        [HttpPost]
+        public IActionResult CreateTask()
+        {
+            return Ok(new { message = "Task created" });
+        }
+    }
+}' > Controllers/TasksController.cs
+          echo 'using Microsoft.AspNetCore.Mvc;
+
+namespace ChecklistApp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UsersController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult GetUsers()
+        {
+            return Ok(new { message = "List of users" });
+        }
+
+        [HttpPost]
+        public IActionResult CreateUser()
+        {
+            return Ok(new { message = "User created" });
+        }
+    }
+}' > Controllers/UsersController.cs
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git checkout -b scaffold
+          git add .
+          git commit -m "Scaffold React frontend and ASP.NET Core backend"
+          git push origin scaffold
